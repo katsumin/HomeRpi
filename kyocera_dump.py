@@ -5,15 +5,21 @@ import smbus
 import threading
 import time
 import sys
+sys.path.append("/home/pi/HomeRpi")
 import datetime
 import commands
+import ConfigParser
+
+iniFile = ConfigParser.SafeConfigParser()
+iniFile.read('./config.ini')
 
 
 # 初期化（38400bps）
 # 0:300, 1:600, 2:1200, 3:2400, 4:4800, 5:9600, 6:19200, 7:38400, 8:57600, 9:115200
 event = threading.Event()
 lock = threading.Lock()
-i2c = smbus.SMBus(1)
+i2c_port = iniFile.get('i2c', 'port')
+i2c = smbus.SMBus(int(i2c_port))
 i2c.write_byte(0x40, 0x07)
 
 ack = ""

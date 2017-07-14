@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-sys.path.append("/home/pi")
+sys.path.append("/home/pi/HomeRpi")
 import socket
 from contextlib import closing
 

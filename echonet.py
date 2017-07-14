@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.append("/home/pi/HomeRpi")
 import ConfigParser
 
 iniFile = ConfigParser.SafeConfigParser()
-iniFile.read('/home/pi/config.ini')
+iniFile.read('./config.ini')
 
 ipv6Addr = iniFile.get('smartmeter', 'address')
 

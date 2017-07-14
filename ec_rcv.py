@@ -3,6 +3,7 @@
 
 import struct
 import sys
+sys.path.append("/home/pi/HomeRpi")
 import socket
 import datetime
 import time
