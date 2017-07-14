@@ -77,7 +77,7 @@ def init_lcd(addr) :
     time.sleep(0.002)
 
 # LCD初期化
-#init_lcd(0x3e)
+init_lcd(0x3e)
 
 # 温度・湿度・気圧計初期化
 bme280_addr = 0x76
@@ -105,7 +105,8 @@ dig_H6 =  s8(i2c.read_byte_data(bme280_addr, 0xe7))
 def init_temp(addr) :
 #    i2c.write_byte_data(addr, 0xf5, 0x00)
 #    i2c.write_byte_data(addr, 0xf2, 0x01)
-    i2c.write_byte_data(addr, 0xf5, 0x10)
+#    i2c.write_byte_data(addr, 0xf5, 0x10)
+    i2c.write_byte_data(addr, 0xf5, 0xb0)
     i2c.write_byte_data(addr, 0xf2, 0x05)
 
 def get_TFine(adc_T) :
@@ -153,8 +154,9 @@ def compensate_H(adc_H, t_fine) :
 #temp = 0
 sensor_addr = 0x76
 init_temp(sensor_addr)
+i2c.write_byte_data(sensor_addr, 0xf4, 0xb7)
 while True :
-    i2c.write_byte_data(sensor_addr, 0xf4, 0xb5)
+#    i2c.write_byte_data(sensor_addr, 0xf4, 0xb5)
 #    i2c.write_byte_data(sensor_addr, 0xf4, 0x25)
     status = i2c.read_byte_data(sensor_addr, 0xf3)
     c = 0
@@ -176,8 +178,20 @@ while True :
     temp  = compensate_T(t_fine)
     press = compensate_P(press, t_fine)
     hum   = compensate_H(hum, t_fine)
-    print "press:{0:.2f}hPa, temp:{1:.2f}C, hum:{2:.2f}%".format(press, temp, hum)
-    time.sleep(10)
+    print "press:{0:.1f}hPa, temp:{1:.1f}C, hum:{2:.1f}%".format(press, temp, hum)
+    str = "{0:6.1f}hPa".format(press)
+    i2c.write_byte_data(0x3e, 0x00, 0x02) # to Home
+    for i in range(str.__len__()) :
+        i2c.write_byte_data(0x3e, 0x40, ord(str[i]))
+    str = "{0:4.1f}C, {1:4.1f}%".format(temp, hum)
+    i2c.write_byte_data(0x3e, 0x00, 0xc0) # to 2nd line Home
+    for i in range(str.__len__()) :
+        i2c.write_byte_data(0x3e, 0x40, ord(str[i]))
+    d = datetime.datetime.today()
+    timestamp = int(time.mktime(d.timetuple())) * 1000000000
+    text = "room temp={0:.1f},hum={1:.1f},press={2:.1f} {3}\n".format(temp,hum,press,timestamp)
+    influxUp(text)
+    time.sleep(60)
 
 #  temp = temp + 1
 #  temp /= 128.0
