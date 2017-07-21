@@ -1,8 +1,3 @@
-'''
-Created on 2017/06/21
-
-@author: mac-katsu
-'''
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
